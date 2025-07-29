@@ -1,1 +1,144 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Redirecionando...</title>
+
+  <!-- Facebook Pixel -->
+  <script>
+    const API_URL = 'https://novaapi-one.vercel.app/api/registerClick';
+    const TELEGRAM_USERNAME = 'gabrielabbimbot';
+    const PIXEL_ID = '762701059469722';
+    const CLIENT_ID = '123';
+
+    const botKeywords = [
+      'facebookexternalhit', 'facebot', 'twitterbot', 'linkedinbot',
+      'slackbot', 'telegrambot', 'whatsapp', 'discordbot',
+      'googlebot', 'bingbot', 'crawler', 'spider', 'preview',
+      'httpclient', 'fetch'
+    ];
+
+    function isBot() {
+      const ua = navigator.userAgent.toLowerCase();
+      return botKeywords.some(bot => ua.includes(bot));
+    }
+
+    function isMobile() {
+      return /android|iphone|ipad|ipod/i.test(navigator.userAgent);
+    }
+
+    function isTouchDevice() {
+      return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    }
+
+    function getCookie(name) {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop().split(';').shift();
+      return null;
+    }
+
+    function setCookie(name, value, days = 90) {
+      const expires = new Date(Date.now() + days * 864e5).toUTCString();
+      document.cookie = `${name}=${value}; expires=${expires}; path=/; SameSite=Lax`;
+    }
+
+    async function registerClickAndRedirect() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const fbclid = urlParams.get('fbclid');
+      let fbp = getCookie('_fbp');
+      if (!fbp) {
+        fbp = `fb.1.${Date.now()}.${Math.floor(Math.random() * 1e16)}`;
+        setCookie('_fbp', fbp);
+      }
+
+      let click_id_from_api = null;
+      try {
+        const response = await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            referer: document.referrer || '',
+            fbclid: fbclid || '',
+            fbp: fbp || '',
+            client_id: CLIENT_ID
+          })
+        });
+        const data = await response.json();
+        if (response.ok && data.status === 'success') {
+          click_id_from_api = data.click_id;
+        } else {
+          console.error('Erro ao registrar clique (API response):', data.message);
+        }
+      } catch (error) {
+        console.error('Erro de rede ao registrar clique:', error);
+      }
+
+      let redirectUrl = `https://t.me/${TELEGRAM_USERNAME}`;
+      if (click_id_from_api) {
+        const encodedClickId = encodeURIComponent(click_id_from_api);
+        redirectUrl += `?start=${encodedClickId}`;
+      }
+
+      console.log(`Redirecionando para: ${redirectUrl}`);
+      window.location.replace(redirectUrl);
+    }
+
+    (function init() {
+      if (isBot() || !(isMobile() && isTouchDevice())) {
+        window.location.replace('https://fernandatamires.netlify.app/');
+        return;
+      }
+
+      registerClickAndRedirect();
+    })();
+  </script>
+
+  <!-- Meta Pixel Code -->
+  <script>
+    !function(f,b,e,v,n,t,s){
+      if(f.fbq)return;n=f.fbq=function(){
+        n.callMethod? n.callMethod.apply(n,arguments):n.queue.push(arguments)
+      };
+      if(!f._fbq)f._fbq=n;
+      n.push=n;n.loaded=!0;n.version='2.0';
+      n.queue=[];
+      t=b.createElement(e);t.async=!0;
+      t.src='https://connect.facebook.net/en_US/fbevents.js';
+      s=b.getElementsByTagName(e)[0];
+      s.parentNode.insertBefore(t,s)
+    }(window, document,'script');
+    fbq('init', PIXEL_ID); 
+    fbq('track', 'PageView');
+  </script>
+  <noscript>
+    <img height="1" width="1" style="display:none"
+      src="https://www.facebook.com/tr?id=762701059469722&ev=PageView&noscript=1"/>
+  </noscript>
+
+  <!-- Twitter conversion tracking base code -->
+  <script>
+    !function(e,t,n,s,u,a){
+      e.twq||(s=e.twq=function(){
+        s.exe?s.exe.apply(s,arguments):s.queue.push(arguments);
+      },
+      s.version='1.1',
+      s.queue=[],
+      u=t.createElement(n),
+      u.async=!0,
+      u.src='https://static.ads-twitter.com/uwt.js',
+      a=t.getElementsByTagName(n)[0],
+      a.parentNode.insertBefore(u,a))
+    }(window,document,'script');
+    twq('config','q89r8');
+  </script>
+  <!-- End Twitter conversion tracking base code -->
+</head>
+<body>
+  <div style="font-family: sans-serif; text-align: center; margin-top: 50px;">
+    <p>Redirecionando você...</p>
+  </div>
+</body>
+</html>
 
