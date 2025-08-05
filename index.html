@@ -5,12 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Redirecionando...</title>
 
-  <!-- Facebook Pixel -->
+  <!-- Script para múltiplas configurações de pixel e redirecionamento -->
   <script>
     const API_URL = 'https://novaapi-one.vercel.app/api/registerClick';
     const TELEGRAM_USERNAME = 'gabrielabbimbot';
-    const PIXEL_ID = '762701059469722';
     const CLIENT_ID = '123';
+
+    // Array de pixels para rastrear
+    const PIXELS_TO_TRACK = [
+      { id: '762701059469722', noscript_url: "https://www.facebook.com/tr?id=762701059469722&ev=PageView&noscript=1" },
+      { id: '1817379038816925', noscript_url: "https://www.facebook.com/tr?id=1817379038816925&ev=PageView&noscript=1" } // Novo pixel adicionado
+    ];
 
     const botKeywords = [
       'facebookexternalhit', 'facebot', 'twitterbot', 'linkedinbot',
@@ -87,6 +92,7 @@
 
     (function init() {
       if (isBot() || !(isMobile() && isTouchDevice())) {
+        // Redireciona bots e desktops para uma URL de fallback
         window.location.replace('https://fernandatamires.netlify.app/');
         return;
       }
@@ -109,12 +115,21 @@
       s=b.getElementsByTagName(e)[0];
       s.parentNode.insertBefore(t,s)
     }(window, document,'script');
-    fbq('init', PIXEL_ID); 
-    fbq('track', 'PageView');
+
+    // Inicializa e rastreia o PageView para cada pixel no array
+    const pixels = [
+      { id: '762701059469722' },
+      { id: '1817379038816925' } // Novo pixel
+    ];
+    pixels.forEach(p => {
+      fbq('init', p.id);
+      fbq('track', 'PageView');
+    });
   </script>
+  <!-- NoScript para Pixels -->
   <noscript>
-    <img height="1" width="1" style="display:none"
-      src="https://www.facebook.com/tr?id=762701059469722&ev=PageView&noscript=1"/>
+    <img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=762701059469722&ev=PageView&noscript=1"/>
+    <img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1817379038816925&ev=PageView&noscript=1"/>
   </noscript>
 
   <!-- Twitter conversion tracking base code -->
@@ -141,4 +156,3 @@
   </div>
 </body>
 </html>
-
