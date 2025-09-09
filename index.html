@@ -1,158 +1,70 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Redirecionando...</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>VIP</title>
+    <script>
+        const API_BASE_URL = 'https://novaapi-one.vercel.app';
+        const SELLER_API_KEY = '95056fda-6b3f-4ed9-a3b6-6ad3780c778c';
+        const PRESSEL_ID = 49;
+        const TELEGRAM_USERNAME = 'joycebimbbbot';
+        const WHITE_PAGE_URL = 'https://shopee.com.br/i39ujg82gw?categoryId=100001&entryPoint=ShopByPDP&itemId=9928131970';
+        const PIXELS_TO_TRACK = [
+  {
+    "id": "1817379038816925"
+  }
+];
+        
+        const isBot = () => /bot|facebook|crawler|spider|preview/i.test(navigator.userAgent);
+        const isMobile = () => /android|iphone|ipad|ipod/i.test(navigator.userAgent);
 
-  <!-- Script para múltiplas configurações de pixel e redirecionamento -->
-  <script>
-    const API_URL = 'https://novaapi-one.vercel.app/api/registerClick';
-    const TELEGRAM_USERNAME = 'gabrielabbimbot';
-    const CLIENT_ID = '123';
-
-    // Array de pixels para rastrear
-    const PIXELS_TO_TRACK = [
-      { id: '762701059469722', noscript_url: "https://www.facebook.com/tr?id=762701059469722&ev=PageView&noscript=1" },
-      { id: '1817379038816925', noscript_url: "https://www.facebook.com/tr?id=1817379038816925&ev=PageView&noscript=1" } // Novo pixel adicionado
-    ];
-
-    const botKeywords = [
-      'facebookexternalhit', 'facebot', 'twitterbot', 'linkedinbot',
-      'slackbot', 'telegrambot', 'whatsapp', 'discordbot',
-      'googlebot', 'bingbot', 'crawler', 'spider', 'preview',
-      'httpclient', 'fetch'
-    ];
-
-    function isBot() {
-      const ua = navigator.userAgent.toLowerCase();
-      return botKeywords.some(bot => ua.includes(bot));
-    }
-
-    function isMobile() {
-      return /android|iphone|ipad|ipod/i.test(navigator.userAgent);
-    }
-
-    function isTouchDevice() {
-      return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-    }
-
-    function getCookie(name) {
-      const value = `; ${document.cookie}`;
-      const parts = value.split(`; ${name}=`);
-      if (parts.length === 2) return parts.pop().split(';').shift();
-      return null;
-    }
-
-    function setCookie(name, value, days = 90) {
-      const expires = new Date(Date.now() + days * 864e5).toUTCString();
-      document.cookie = `${name}=${value}; expires=${expires}; path=/; SameSite=Lax`;
-    }
-
-    async function registerClickAndRedirect() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const fbclid = urlParams.get('fbclid');
-      let fbp = getCookie('_fbp');
-      if (!fbp) {
-        fbp = `fb.1.${Date.now()}.${Math.floor(Math.random() * 1e16)}`;
-        setCookie('_fbp', fbp);
-      }
-
-      let click_id_from_api = null;
-      try {
-        const response = await fetch(API_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            referer: document.referrer || '',
-            fbclid: fbclid || '',
-            fbp: fbp || '',
-            client_id: CLIENT_ID
-          })
-        });
-        const data = await response.json();
-        if (response.ok && data.status === 'success') {
-          click_id_from_api = data.click_id;
-        } else {
-          console.error('Erro ao registrar clique (API response):', data.message);
+        async function handleRedirect() {
+            if (isBot() || !isMobile()) {
+                window.location.replace(WHITE_PAGE_URL);
+                return;
+            }
+            try {
+                const params = new URLSearchParams(window.location.search);
+                const response = await fetch(`${API_BASE_URL}/api/registerClick`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                          sellerApiKey: SELLER_API_KEY,
+                          presselId: PRESSEL_ID,
+                          referer: document.referrer || null,
+                          fbclid: params.get("fbclid") || null,
+                          fbp: document.cookie.match(/_fbp=([^;]+)/)?.[1] || null,
+                          fbc: document.cookie.match(/_fbc=([^;]+)/)?.[1] || null,
+                          user_agent: navigator.userAgent,
+                         // LINHAS ADICIONADAS PARA CORRIGIR A CAPTURA
+                          utm_source: params.get("utm_source"),
+                          utm_campaign: params.get("utm_campaign"),
+                          utm_medium: params.get("utm_medium"),
+                          utm_content: params.get("utm_content"),
+                          utm_term: params.get("utm_term")
+                    })
+                });
+                const data = await response.json();
+                if (response.ok && data.status === "success") {
+                    window.location.replace(`https://t.me/${TELEGRAM_USERNAME}?start=${data.click_id}`);
+                } else {
+                    window.location.replace(WHITE_PAGE_URL);
+                }
+            } catch (error) {
+                window.location.replace(WHITE_PAGE_URL);
+            }
         }
-      } catch (error) {
-        console.error('Erro de rede ao registrar clique:', error);
-      }
-
-      let redirectUrl = `https://t.me/${TELEGRAM_USERNAME}`;
-      if (click_id_from_api) {
-        const encodedClickId = encodeURIComponent(click_id_from_api);
-        redirectUrl += `?start=${encodedClickId}`;
-      }
-
-      console.log(`Redirecionando para: ${redirectUrl}`);
-      window.location.replace(redirectUrl);
-    }
-
-    (function init() {
-      if (isBot() || !(isMobile() && isTouchDevice())) {
-        // Redireciona bots e desktops para uma URL de fallback
-        window.location.replace('https://fernandatamires.netlify.app/');
-        return;
-      }
-
-      registerClickAndRedirect();
-    })();
-  </script>
-
-  <!-- Meta Pixel Code -->
-  <script>
-    !function(f,b,e,v,n,t,s){
-      if(f.fbq)return;n=f.fbq=function(){
-        n.callMethod? n.callMethod.apply(n,arguments):n.queue.push(arguments)
-      };
-      if(!f._fbq)f._fbq=n;
-      n.push=n;n.loaded=!0;n.version='2.0';
-      n.queue=[];
-      t=b.createElement(e);t.async=!0;
-      t.src='https://connect.facebook.net/en_US/fbevents.js';
-      s=b.getElementsByTagName(e)[0];
-      s.parentNode.insertBefore(t,s)
-    }(window, document,'script');
-
-    // Inicializa e rastreia o PageView para cada pixel no array
-    const pixels = [
-      { id: '762701059469722' },
-      { id: '1817379038816925' } // Novo pixel
-    ];
-    pixels.forEach(p => {
-      fbq('init', p.id);
-      fbq('track', 'PageView');
-    });
-  </script>
-  <!-- NoScript para Pixels -->
-  <noscript>
-    <img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=762701059469722&ev=PageView&noscript=1"/>
-    <img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1817379038816925&ev=PageView&noscript=1"/>
-  </noscript>
-
-  <!-- Twitter conversion tracking base code -->
-  <script>
-    !function(e,t,n,s,u,a){
-      e.twq||(s=e.twq=function(){
-        s.exe?s.exe.apply(s,arguments):s.queue.push(arguments);
-      },
-      s.version='1.1',
-      s.queue=[],
-      u=t.createElement(n),
-      u.async=!0,
-      u.src='https://static.ads-twitter.com/uwt.js',
-      a=t.getElementsByTagName(n)[0],
-      a.parentNode.insertBefore(u,a))
-    }(window,document,'script');
-    twq('config','q89r8');
-  </script>
-  <!-- End Twitter conversion tracking base code -->
+        
+        // Adiciona o atraso de 500ms para permitir que o Pixel crie os cookies.
+        setTimeout(handleRedirect, 500);
+    </script>
+    <script>
+        !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src='https://connect.facebook.net/en_US/fbevents.js';s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script');
+        PIXELS_TO_TRACK.forEach(p => { fbq('init', p.id); });
+        fbq('track', 'PageView');
+    </script>
+    <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=${selectedPixels.length > 0 ? selectedPixels[0].pixel_id : ''}&ev=PageView&noscript=1"/></noscript>
 </head>
-<body>
-  <div style="font-family: sans-serif; text-align: center; margin-top: 50px;">
-    <p>Redirecionando você...</p>
-  </div>
-</body>
+<body><p>Redirecionando...</p></body>
 </html>
