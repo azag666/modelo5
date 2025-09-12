@@ -10,33 +10,10 @@
 
     <title>Acesso VIP</title>
     <style>
-        /* Estilos permanecem os mesmos */
-        body {
-            margin: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
-                Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-            background-color: #f0f2f5;
-            color: #1c1e21;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            text-align: center;
-        }
+        body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif; background-color: #f0f2f5; color: #1c1e21; display: flex; justify-content: center; align-items: center; height: 100vh; text-align: center; }
         .container { padding: 20px; }
-        .spinner {
-            border: 4px solid rgba(0, 0, 0, 0.1);
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            border-left-color: #0d6efd;
-            margin: 20px auto;
-            animation: spin 1s ease infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+        .spinner { border: 4px solid rgba(0, 0, 0, 0.1); width: 36px; height: 36px; border-radius: 50%; border-left-color: #0d6efd; margin: 20px auto; animation: spin 1s ease infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         h1 { font-size: 1.5em; margin: 0 0 10px 0; }
         p { font-size: 1em; color: #606770; }
     </style>
@@ -45,22 +22,17 @@
     <div class="container">
         <div class="spinner"></div>
         <h1>A preparar o seu acesso...</h1>
-        <p>Aguarde um momento, estamos a redirecioná-lo em segurança.</p>
+        <p>Aguarde um momento, Abrindo Telegram.</p>
     </div>
 
     <script>
-        // --- Configurações ---
         const API_BASE_URL = 'https://novaapi-one.vercel.app';
         const SELLER_API_KEY = 'a0b2f4ce-2011-4faf-9e77-52e59bbcb02b';
         const PRESSEL_ID = 49;
         const TELEGRAM_USERNAME = 'joycebimbbbot';
         const WHITE_PAGE_URL = 'https://shopee.com.br/i39ujg82gw?categoryId=100001&entryPoint=ShopByPDP&itemId=9928131970';
         const PIXELS_TO_TRACK = [{"id": "1817379038816925"}];
-
-        // --- Lógica Principal ---
-
         const getCookie = (name) => document.cookie.match(new RegExp(`(^| )${name}=([^;]+)`))?.[2] || null;
-
         async function registerAndRedirect() {
             try {
                 const params = new URLSearchParams(window.location.search);
@@ -93,18 +65,12 @@
                 window.location.replace(WHITE_PAGE_URL);
             }
         }
-
-        // --- Inicialização do Pixel do Facebook ---
+        document.addEventListener('DOMContentLoaded', registerAndRedirect);
         !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src='https://connect.facebook.net/en_US/fbevents.js';s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script');
-        
         if (typeof PIXELS_TO_TRACK !== 'undefined' && Array.isArray(PIXELS_TO_TRACK)) {
             PIXELS_TO_TRACK.forEach(p => { fbq('init', p.id); });
         }
         fbq('track', 'PageView');
-
-        // --- Inicia o processo ---
-        // Usamos 'DOMContentLoaded' pois é mais rápido que 'window.onload'
-        document.addEventListener('DOMContentLoaded', registerAndRedirect);
     </script>
     <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=PIXEL_ID_AQUI&ev=PageView&noscript=1"/></noscript>
 </body>
